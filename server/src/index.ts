@@ -37,6 +37,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('join-room', (roomId) => {
+        // Check if the room exists before joining
         const room = io.sockets.adapter.rooms.get(roomId);
         if (!room) {
             socket.emit('room-not-found');
