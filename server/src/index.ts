@@ -6,7 +6,6 @@ import 'dotenv/config';
 const app = express();
 const server = createServer(app);
 
-// In-memory room registry with TTL
 type Room = {
     id: string;
     createdAt: Date;
