@@ -6,6 +6,17 @@ import 'dotenv/config';
 const app = express();
 const server = createServer(app);
 
+function generateRoomId(): string {
+    // Listing the characters so we dont generate any weird characters :p
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let id = '';
+    // only 4 characters so ish cleann
+    for (let i = 0; i < 4; i++) {
+        id += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return id;
+}
+
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
@@ -20,7 +31,7 @@ io.on('connection', (socket) => {
     console.log('a peer connected with ID: ' + socket.id);
 
     socket.on('create-room', () => {
-        const roomId = Math.random().toString(36).substring(4, 8); // Generate a short random room ID with 4 characters
+        const roomId = generateRoomId();
         socket.join(roomId);
         socket.emit('room-created', roomId);
     });

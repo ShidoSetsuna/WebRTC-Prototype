@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { socket } from './socket';
+import Room from './components/room';
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -30,9 +31,11 @@ function App() {
     if (existingRoomId) {
       socket.emit('join-room', existingRoomId);
       setRoomId(existingRoomId);
+      setSharableLink(`${window.location.origin}?room=${existingRoomId}`);
     }
 
     return () => {
+      //Are these necessary? 
       socket.off('connect');
       socket.off('disconnect');
       socket.off('room-created');
@@ -52,14 +55,7 @@ function App() {
         <button onClick={handleCreateRoom}>Create Room</button>
       )}
       {roomId && (
-        <section>
-          <p>Room ID: {roomId}</p>
-          {sharableLink && (
-            <button onClick={() => navigator.clipboard.writeText(sharableLink)}>
-              Copy Sharable Link
-            </button>
-          )}
-        </section>
+        <Room roomId={roomId} sharableLink={sharableLink} />
       )}
     </>
   );
