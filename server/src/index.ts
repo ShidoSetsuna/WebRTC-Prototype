@@ -6,6 +6,27 @@ import 'dotenv/config';
 const app = express();
 const server = createServer(app);
 
+// In-memory room registry with TTL
+type Room = {
+    id: string;
+    createdAt: Date;
+    lastActivity: Date;
+};
+
+const rooms = new Map<string, Room>();
+const ROOM_TTL_MS = 30 * 60 * 1000; // 30m
+
+// Periodic cleanup of stale rooms  
+setInterval(() => {
+    const now = Date.now();
+    for (const [id, room] of rooms.entries()) {
+        if (now - room.lastActivity.getTime() > ROOM_TTL_MS) {
+            rooms.delete(id);
+            console.log(`Cleaned up stale room: ${id}`);
+        }
+    }
+}, 60 * 1000);
+
 function generateRoomId(): string {
     // Listing the characters so we dont generate any weird characters :p
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -32,20 +53,26 @@ io.on('connection', (socket) => {
 
     socket.on('create-room', () => {
         const roomId = generateRoomId();
+        rooms.set(roomId, {
+            id: roomId,
+            createdAt: new Date(),
+            lastActivity: new Date(),
+        });
         socket.join(roomId);
         socket.emit('room-created', roomId);
     });
 
-    socket.on('join-room', (roomId) => {
-        // Check if the room exists before joining
-        const room = io.sockets.adapter.rooms.get(roomId);
+    socket.on('join-room', (roomId: string) => {
+        const room = rooms.get(roomId);
         if (!room) {
             socket.emit('room-not-found');
             return;
         }
+        // Update activity timestamp
+        room.lastActivity = new Date();
         socket.join(roomId);
         socket.to(roomId).emit('peer-joined', socket.id);
-    })
+    });
 });
 
 server.listen(process.env.PORT, () => {

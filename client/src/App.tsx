@@ -3,11 +3,14 @@ import { socket } from './socket';
 import Room from './components/room';
 
 function App() {
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(() => socket.connected);
   const [roomId, setRoomId] = useState<string | null>(null);
   const [sharableLink, setSharableLink] = useState<string | null>(null);
 
   useEffect(() => {
+    // Set initial state in case we missed the connect event
+    setIsConnected(socket.connected);
+    
     socket.on('connect', () => setIsConnected(true));
     socket.on('disconnect', () => setIsConnected(false));
     
@@ -35,7 +38,6 @@ function App() {
     }
 
     return () => {
-      //Are these necessary? 
       socket.off('connect');
       socket.off('disconnect');
       socket.off('room-created');
