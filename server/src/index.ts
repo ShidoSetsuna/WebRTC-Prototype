@@ -36,14 +36,15 @@ function generateRoomId(): string {
     }
     return id;
 }
-
+// Don need dis anymore but keeping it here just in case :p
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('owo');
 });
-    
+
 const io = new Server(server, {
     cors: {
-        origin: '*',
+        // This needs updating for actual deployment
+        origin: process.env.CLIENT_URL?.split(',') || ['http://localhost:5173'],
     }
 });
 
