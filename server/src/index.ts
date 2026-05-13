@@ -63,17 +63,39 @@ io.on('connection', (socket) => {
 
     socket.on('join-room', (roomId: string) => {
         const room = rooms.get(roomId);
+        // check if room exists
         if (!room) {
             socket.emit('room-not-found');
             return;
         }
+
+        // check if room is full (2 peers)
+        const clients = io.sockets.adapter.rooms.get(roomId);
+        if (clients && clients.size >= 2) {
+            socket.emit('room-full');
+            return;
+        }
+
         // Update activity timestamp
         room.lastActivity = new Date();
         socket.join(roomId);
         socket.to(roomId).emit('peer-joined', socket.id);
     });
+
+    socket.on('offer', ({ roomId, offer }) => {
+        socket.to(roomId).emit('offer', { offer, senderId: socket.id });
+    });
+
+    socket.on('answer', ({ roomId, answer }) => {
+        socket.to(roomId).emit('answer', { answer, senderId: socket.id });
+    });
+
+    socket.on('ice-candidate', ({ roomId, candidate }) => {
+        socket.to(roomId).emit('ice-candidate', { candidate, senderId: socket.id });
+    });
+
 });
 
 server.listen(process.env.PORT, () => {
     console.log(`Server ish running on port ${process.env.PORT} uwu`);
-})
+});

@@ -1,6 +1,14 @@
 import { useEffect, useRef } from 'react';
-import { createPeerConnection, getLocalMedia } from '../webrtc';
 import { socket } from '../socket';
+
+import { 
+    createPeerConnection, 
+    getLocalMedia, 
+    createOffer, 
+    handleOffer, 
+    handleAnswer, 
+    handleIceCandidate  
+} from '../webrtc';
 
 type RoomProps = {
     roomId: string;
@@ -39,8 +47,36 @@ export default function Room( { roomId, sharableLink }: RoomProps ) {
                 socket.emit('ice-candidate', { roomId, candidate: event.candidate });
             }
         };
+
+        socket.on('peer-joined', () => {
+        if (pcRef.current) {
+            createOffer(pcRef.current, socket, roomId);
+        }
+        });
+
+        socket.on('offer', ({ offer }) => {
+        if (pcRef.current) {
+            handleOffer(pcRef.current, offer, socket, roomId);
+        }
+        });
+
+        socket.on('answer', ({ answer }) => {
+        if (pcRef.current) {
+            handleAnswer(pcRef.current, answer);
+        }
+        });
+
+        socket.on('ice-candidate', ({ candidate }) => {
+        if (pcRef.current) {
+            handleIceCandidate(pcRef.current, candidate);
+        }
+        });
                 
         return () => {
+            socket.off('peer-joined');
+            socket.off('offer');
+            socket.off('answer');
+            socket.off('ice-candidate');
             pc.close();
             pcRef.current = null;
             localStream?.getTracks().forEach(track => track.stop());

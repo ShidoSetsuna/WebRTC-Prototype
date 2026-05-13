@@ -28,6 +28,10 @@ function App() {
       console.error('Room not found');
     });
 
+    socket.on('room-full', () => {
+      console.error('Room is full');
+    });
+
     // Check for room ID in url and attempt to join if it exists
     const params = new URLSearchParams(window.location.search);
     const existingRoomId = params.get('room');
@@ -43,6 +47,7 @@ function App() {
       socket.off('room-created');
       socket.off('peer-joined');
       socket.off('room-not-found');
+      socket.off('room-full');
     };
   }, []);
 
@@ -63,4 +68,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
