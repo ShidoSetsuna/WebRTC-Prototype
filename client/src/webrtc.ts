@@ -18,8 +18,15 @@ export async function getLocalMedia(): Promise<MediaStream> {
     }
 }
 
-export async function createOffer(pc: RTCPeerConnection, socket: Socket, roomId: string): Promise<void> {
-    const offer = await pc.createOffer();
+export async function createOffer(
+    pc: RTCPeerConnection,
+    socket: Socket,
+    roomId: string
+): Promise<void> {
+    const offer = await pc.createOffer({
+        offerToReceiveVideo: true,
+        offerToReceiveAudio: false
+    });
     await pc.setLocalDescription(offer);
     socket.emit('offer', { roomId, offer });
 }
