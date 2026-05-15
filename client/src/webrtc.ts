@@ -10,7 +10,7 @@ export function createPeerConnection() {
 
 export async function getLocalMedia(): Promise<MediaStream> {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         return stream;
     } catch (error) {
         console.error('Error accessing media devices.', error);
