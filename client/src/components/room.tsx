@@ -121,9 +121,10 @@ export default function Room( { roomId, sharableLink }: RoomProps ) {
                 Copy Sharable Link
                 </button>
             )}
-            <p>Current peers: </p>
-            <video ref={localVideoRef} autoPlay muted style={{ width: '300px' }} />
-            <video ref={remoteVideoRef} autoPlay style={{ width: '300px' }} />
+            <div className="video-container">
+                <video ref={localVideoRef} autoPlay muted playsInline />
+                <video ref={remoteVideoRef} autoPlay playsInline />
+            </div>
         </section>
     )
 }

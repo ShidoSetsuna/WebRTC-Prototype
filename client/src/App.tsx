@@ -56,15 +56,15 @@ function App() {
   };
 
   return (
-    <>
-      <h1>{isConnected ? 'Connected' : 'Disconnected'}</h1>
-      {!roomId && (
-        <button onClick={handleCreateRoom}>Create Room</button>
-      )}
-      {roomId && (
-        <Room roomId={roomId} sharableLink={sharableLink} />
-      )}
-    </>
+      <>
+          <h1>{isConnected ? 'Connected' : 'Disconnected'}</h1>
+          {!roomId && (
+              <div className="home-actions">
+                  <button onClick={handleCreateRoom}>Create Room</button>
+              </div>
+          )}
+          {roomId && <Room roomId={roomId} sharableLink={sharableLink} />}
+      </>
   );
 }
 
